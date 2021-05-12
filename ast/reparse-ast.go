@@ -44,6 +44,7 @@ func ReparseAst(ast models.PrometheusAst) string {
 	switch ast.Dtype {
 	case "comment":
 		strBuilder.WriteString(ast.Value)
+		strBuilder.WriteRune('\n')
 	case "labeled":
 		strBuilder.WriteString(ast.Value)
 		strBuilder.WriteRune(' ')
@@ -59,10 +60,12 @@ func ReparseAst(ast models.PrometheusAst) string {
 		strBuilder.WriteRune('}')
 		strBuilder.WriteRune(' ')
 		strBuilder.WriteString(ast.Count)
+		strBuilder.WriteRune('\n')
 	case "unlabeled":
 		strBuilder.WriteString(ast.Value)
 		strBuilder.WriteRune(' ')
 		strBuilder.WriteString(ast.Count)
+		strBuilder.WriteRune('\n')
 	}
 	return strBuilder.String()
 }
