@@ -14,7 +14,7 @@ func main() {
 		a := ast.ParseAst(v)
 		ast.AppendLabel(&a, "looooooo", "1232311")
 		b := ast.ReparseAst(a)
-		fmt.Println(b)
+		fmt.Print(b)
 	}
 
 }
