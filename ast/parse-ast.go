@@ -12,66 +12,59 @@ import (
 func ParseAst(str string) models.PrometheusAst {
 	var ast models.PrometheusAst
 	if strings.HasPrefix(str, "#") {
-		// comment
-		ast.Dtype = "comment"
+		ast.Dtype = "comment" // comment type
 		ast.Value = str
-	} else if strings.Index(str, "{") >= 0 && strings.Index(str, "}") >= 0 {
-		// labeled
+	} else if strings.Contains(str, "{") && strings.Contains(str, "}") {
 		ast.Dtype = "labeled"
 		var bf strings.Builder
 		var count strings.Builder
 		var parseName strings.Builder
-
 		status := "preside"
-
 		var child models.AstChild
-
 		for _, v := range str {
-			currentChar := string(v)
-			if currentChar == " " {
+			if v == ' ' {
 				continue
 			}
 			switch status {
 			case "preside":
-				if currentChar == "{" {
+				if v == '{' {
 					status = "inside"
 					continue
 				}
-				bf.WriteString(currentChar)
+				bf.WriteRune(v)
+
 			case "inside":
-				switch currentChar {
-				case "}":
+				switch v {
+				case '}':
 					status = "outside"
 					child.Value = parseName.String()
 					parseName.Reset()
 					ast.Children = append(ast.Children, child)
-				case ",":
+				case ',':
 					child.Value = parseName.String()
 					parseName.Reset()
 					ast.Children = append(ast.Children, child)
-				case "=":
+				case '=':
 					child.TagName = parseName.String()
 					parseName.Reset()
 				default:
-					parseName.WriteString(currentChar)
+					parseName.WriteRune(v)
 				}
 			case "outside":
-				count.WriteString(currentChar)
+				count.WriteRune(v)
 			}
 		}
 		ast.Count = count.String()
 		ast.Value = bf.String()
 	} else {
-		// unlabeled
 		ast.Dtype = "unlabeled"
 		var parseName strings.Builder
 		for _, v := range str {
-			currentChar := string(v)
-			if currentChar == " " {
+			if v == ' ' {
 				ast.Value = parseName.String()
 				parseName.Reset()
 			} else {
-				parseName.WriteString(currentChar)
+				parseName.WriteRune(v)
 			}
 		}
 		ast.Count = parseName.String()
